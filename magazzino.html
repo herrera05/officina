@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Magazzino</title>
+    </head>
+    <body>
+
+        <h2>Gestione Magazzino</h2>
+
+        <button onclick="logout()">Logout</button>
+
+        <br><br>
+
+        <label>Officina:</label>
+        <select id="officinaSelect"></select>
+
+        <br><br>
+
+        <label>Ricambio:</label>
+        <select id="ricambioSelect"></select>
+
+        <br><br>
+
+        <label>Quantita':</label>
+        <input type="number" id="quantita" value="1">
+
+        <br><br>
+
+        <button onclick="aggiungi()">Aggiungi</button>
+        <button onclick="rimuovi()">Rimuovi</button>
+
+        <script>
+        // protezione
+        if(localStorage.getItem("ruolo") !== "magazziniere"){
+            window.location.href = "login.html";
+        }
+
+        // logout
+        function logout(){
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        // carica officine
+        fetch("api/officine.php")
+        .then(res => res.json())
+        .then(data => {
+            let select = document.getElementById("officinaSelect");
+            data.forEach(o => {
+                let opt = document.createElement("option");
+                opt.value = o.codice;
+                opt.textContent = o.denominazione;
+                select.appendChild(opt);
+            });
+        });
+
+        // carica ricambi
+        fetch("api/get_ricambi.php")
+        .then(res => res.json())
+        .then(data => {
+            let select = document.getElementById("ricambioSelect");
+            data.forEach(r => {
+                let opt = document.createElement("option");
+                opt.value = r.codice_pezzo;
+                opt.textContent = r.descrizione;
+                select.appendChild(opt);
+            });
+        });
+
+        // aggiungi
+        function aggiungi(){
+            operazione("aggiungi");
+        }
+
+        // rimuovi
+        function rimuovi(){
+            operazione("rimuovi");
+        }
+
+        function operazione(tipo){
+            fetch("api/magazzino.php", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    officina: document.getElementById("officinaSelect").value,
+                    pezzo: document.getElementById("ricambioSelect").value,
+                    quantita: document.getElementById("quantita").value,
+                    tipo: tipo
+                })
+            }).then(()=>alert("Operazione completata"));
+        }
+        </script>
+
+    </body>
+</html>

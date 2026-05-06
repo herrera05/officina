@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ADMIN</title>
+    </head>
+    <body>
+        <script src="js/app.js"></script>
+
+        <h2>Area Admin</h2>
+
+        <button onclick="logout()">Logout</button>
+
+        <br><br>
+
+        <!--<label>Seleziona Officina:</label>
+        <select id="officinaSelect"></select> -->
+
+        <h3>Aggiungi Servizio</h3>
+        <input type="text" id="servizioNome">
+        <button onclick="addServizio()">Aggiungi</button>
+        
+        <h3>Aggiungi Ricambio</h3>
+        <input type="text" id="ricambioNome">
+        <button onclick="addRicambio()">Aggiungi</button>
+        
+        <h3>Aggiungi Accessorio</h3>
+        <input type="text" id="accessorioNome">
+        <button onclick="addAccessorio()">Aggiungi</button>
+
+        <!-- button con indirizzaione alla pagina x la parte di associazione dei servizi ed accessori alle officine -->
+            <!-- selezionare servizio/accessorio tramite elenco -->
+            <!-- e selezionare 1 o più officine (con comboboxes) per l'associazione dei servizi/accessori -->
+
+
+        <button onclick="window.location.href='associazioni.html'">
+            Associa Servizi / Accessori
+        </button> 
+        <script>
+            if(localStorage.getItem("admin") !== "true"){
+                window.location.href = "login.html";
+            }
+
+            fetch("api/officine.php")
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById("officinaSelect");
+
+                data.forEach(officina => {
+                    let option = document.createElement("option");
+                    option.value = officina.id;
+                    option.textContent = officina.nome;
+                    select.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error("Errore caricamento officine:", err);
+            });
+
+            function logout(){
+                localStorage.removeItem("admin");
+                window.location.href = "index.html";
+            }
+        </script>
+
+    </body>
+</html>

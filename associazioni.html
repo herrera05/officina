@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Associazioni</title>
+    </head>
+
+    <body>
+
+        <h2>Associa Servizi / Accessori alle Officine</h2>
+        <button onclick="logout()">Logout</button>
+        <hr>
+        <h3>Associa Servizio</h3>
+        <select id="servizioSelect"></select>
+        <br><br>
+        <label>Seleziona officine:</label><br>
+        <div id="officineServizi"></div>
+
+        <br>
+        <button onclick="associaServizio()">Associa Servizio</button>
+
+        <hr>
+
+        <h3>Associa Accessorio</h3>
+
+        <select id="accessorioSelect"></select>
+
+        <br><br>
+
+        <label>Seleziona officine:</label><br>
+        <div id="officineAccessori"></div>
+
+        <br>
+        <button onclick="associaAccessorio()">Associa Accessorio</button>
+
+        <script>
+            // protezione
+            if (localStorage.getItem("admin") !== "true") {
+                window.location.href = "login.html";
+            }
+
+            // logout
+            function logout() {
+                localStorage.removeItem("admin");
+                window.location.href = "index.html";
+            }
+
+            // carica dati
+            fetch("api/officine.php")
+                .then(res => res.json())
+                .then(data => {
+
+                    let divServizi = document.getElementById("officineServizi");
+                    let divAccessori = document.getElementById("officineAccessori");
+
+                    data.forEach(o => {
+                        let checkbox1 = `<input type="checkbox" value="${o.codice}"> ${o.denominazione}<br>`;
+                        let checkbox2 = `<input type="checkbox" value="${o.codice}"> ${o.denominazione}<br>`;
+
+                        divServizi.innerHTML += checkbox1;
+                        divAccessori.innerHTML += checkbox2;
+                    });
+                });
+
+            // carica servizi
+            fetch("api/get_servizi.php")
+                .then(res => res.json())
+                .then(data => {
+                    let select = document.getElementById("servizioSelect");
+                    data.forEach(s => {
+                        let opt = document.createElement("option");
+                        opt.value = s.codice;
+                        opt.textContent = s.descrizione;
+                        select.appendChild(opt);
+                    });
+                });
+
+            // carica accessori
+            fetch("api/get_accessori.php")
+                .then(res => res.json())
+                .then(data => {
+                    let select = document.getElementById("accessorioSelect");
+                    data.forEach(a => {
+                        let opt = document.createElement("option");
+                        opt.value = a.codice_articolo;
+                        opt.textContent = a.descrizione;
+                        select.appendChild(opt);
+                    });
+                });
+
+            // associa servizio
+            function associaServizio() {
+                let servizio = document.getElementById("servizioSelect").value;
+                let checkboxes = document.querySelectorAll("#officineServizi input:checked");
+
+                let officine = [];
+                checkboxes.forEach(c => officine.push(c.value));
+
+                fetch("api/associa_servizio.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ servizio, officine })
+                }).then(() => alert("Servizio associato"));
+            }
+
+            // associa accessorio
+            function associaAccessorio() {
+                let accessorio = document.getElementById("accessorioSelect").value;
+                let checkboxes = document.querySelectorAll("#officineAccessori input:checked");
+
+                let officine = [];
+                checkboxes.forEach(c => officine.push(c.value));
+
+                fetch("api/associa_accessorio.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ accessorio, officine })
+                }).then(() => alert("Accessorio associato"));
+            }
+        </script>
+
+    </body>
+
+</html>

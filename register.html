@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Registrazione</title>
+    </head>
+    <body>
+
+    <h2>Registrazione</h2>
+
+    <input type="text" id="username" placeholder="Username"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+
+    <button onclick="inviaOTP()">Invia OTP</button>
+
+    <br><br>
+
+    <input type="text" id="otp" placeholder="Inserisci OTP"><br>
+    <button onclick="verificaOTP()">Verifica OTP</button>
+
+    <script>
+    function inviaOTP(){
+        fetch("api/genera_otp.php", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                user: document.getElementById("username").value,
+                password: document.getElementById("password").value
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert("OTP generato (simulato): " + data.otp); // ⚠️ simulazione
+        });
+    }
+
+    function verificaOTP(){
+        fetch("api/verifica_otp.php", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                user: document.getElementById("username").value,
+                otp: document.getElementById("otp").value
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success){
+                alert("Registrazione completata!");
+                window.location.href = "login.html";
+            } else {
+                alert("OTP errato");
+            }
+        });
+    }
+    </script>
+
+    </body>
+</html>
